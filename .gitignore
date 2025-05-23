@@ -1,0 +1,74 @@
+# Compiled class files
+target/
+bin/
+
+# Maven specific files
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/
+mvnw
+mvnw.cmd
+*.log
+*.swp
+*.bat
+*.sh
+
+# Logs
+*.log
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Eclipse, IntelliJ IDEA files
+.metadata/
+*.tmp
+*.bak
+
+# Eclipse specific files
+.project
+.classpath
+.settings/
+.buildpath
+
+# IntelliJ IDEA specific files
+*.iml
+.idea/
+out/
+
+# NetBeans specific files
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# VS Code specific files
+.vscode/
+
+# OS generated files (Mac/Linux)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Packages
+*.jar
+*.war
+*.nar
+*.ear
+
+# Spring Boot specific files
+spring.log
+/\*.log
+
+# Build directories
+build/
+
+#Env files
+**.env
