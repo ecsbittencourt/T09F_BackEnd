@@ -26,6 +26,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(NomeSetorInvalidoException.class)
+    public ResponseEntity<ApiError> hancdleNomeSetorInvalidoExcpetion(NomeSetorInvalidoException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiError(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getContextPath())
+        );
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiError> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
