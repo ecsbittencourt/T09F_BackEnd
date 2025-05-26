@@ -1,17 +1,14 @@
 package com.example.oracleapi.service;
 
-import com.example.oracleapi.AcaoExameDTO;
 import com.example.oracleapi.dto.SetorDTO;
 import oracle.jdbc.OracleTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SetorService {
@@ -28,6 +25,42 @@ public class SetorService {
         return buscarPorNome(dto.getNome());
     }
 
+    public List<SetorDTO> listarSetores() throws SQLException {
+        List<SetorDTO> setores = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SETORES(?)}")) {
+            stmt.registerOutParameter(1, OracleTypes.CURSOR);
+            stmt.execute();
+
+            ResultSet rs = (ResultSet) stmt.getObject(1);
+            while (rs.next()) {
+                setores.add(new SetorDTO(rs.getString("NOME"), rs.getInt("ID")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("Erro ao listar setores: " + e.getMessage());
+        }
+        return setores;
+    }
+
+
+    public void atualizarSetor(int id, String nome) throws SQLException {
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_ATUALIZAR_SETOR(?, ?)}")) {
+            stmt.setInt(1, id);
+            stmt.setString(2, nome);
+            stmt.execute();
+        }
+    }
+
+    public void deletarSetor(int id) throws SQLException {
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_DELETAR_SETOR(?)}")) {
+            stmt.setInt(1, id);
+            stmt.execute();
+        }
+    }
+
     public SetorDTO buscarPorNome(String nome) throws SQLException {
         try (Connection conn = dataSource.getConnection();
              CallableStatement stmt = conn.prepareCall("{call T09F_BUSCAR_SETOR_POR_NOME(?, ?)}")) {
@@ -37,10 +70,7 @@ public class SetorService {
 
             try (ResultSet rs = (ResultSet) stmt.getObject(2)) {
                 if (rs.next()) {
-                    SetorDTO dto = new SetorDTO();
-                    dto.setNome(rs.getString("NOME"));
-                    dto.setId(rs.getInt("ID"));
-                    return dto;
+                    return new SetorDTO(rs.getString("NOME"), rs.getInt("ID"));
                 }
             }
         }
