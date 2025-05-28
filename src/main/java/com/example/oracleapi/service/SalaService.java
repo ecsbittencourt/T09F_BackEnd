@@ -49,6 +49,27 @@ public class SalaService {
         return salas;
     }
 
+    public SalaDTO buscarPorId(int id) throws SQLException {
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_BUSCAR_SALA_POR_ID(?, ?)}")) {
+
+            stmt.setInt(1, id);
+            stmt.registerOutParameter(2, OracleTypes.CURSOR);
+            stmt.execute();
+
+            try (ResultSet rs = (ResultSet) stmt.getObject(2)) {
+                if (rs.next()) {
+                    return new SalaDTO(
+                            rs.getInt("ID"),
+                            rs.getInt("NUMERO"),
+                            rs.getInt("ID_SETOR")
+                    );
+                }
+            }
+        }
+        return null; // retorna null se não achar
+    }
+
     public void editarSala(int id, SalaDTO dto) throws SQLException {
         try (Connection conn = dataSource.getConnection();
              CallableStatement stmt = conn.prepareCall("{call T09F_ATUALIZAR_SALA(?, ?, ?)}")) {
