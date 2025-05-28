@@ -6,24 +6,16 @@ public class UnidadeMedidaDTO {
 
     public UnidadeMedidaDTO() {}
 
-    public UnidadeMedidaDTO(String medida, int id) {
-        this.medida = medida;
+    public UnidadeMedidaDTO(int id, String medida) {
         this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getMedida() {
-        return medida;
-    }
-
-    public void setMedida(String medida) {
         this.medida = medida;
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
+
+    public String getMedida() { return medida; }
+
+    public void setMedida(String medida) { this.medida = medida; }
 }
