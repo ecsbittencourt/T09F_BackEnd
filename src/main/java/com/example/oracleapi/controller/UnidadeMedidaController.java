@@ -14,18 +14,28 @@ import java.util.List;
 public class UnidadeMedidaController {
 
     @Autowired
-    private UnidadeMedidaService unidadeMedidaService;
-
-    @PostMapping
-    public ResponseEntity<UnidadeMedidaDTO> criarUnidade(@RequestBody UnidadeMedidaDTO dto) throws SQLException {
-        if (dto.getMedida() == null || dto.getMedida().trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(unidadeMedidaService.criarUnidadeMedida(dto));
-    }
+    private UnidadeMedidaService service;
 
     @GetMapping
     public ResponseEntity<List<UnidadeMedidaDTO>> listar() throws SQLException {
-        return ResponseEntity.ok(unidadeMedidaService.listarUnidadesMedida());
+        return ResponseEntity.ok(service.listar());
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> inserir(@RequestBody UnidadeMedidaDTO dto) throws SQLException {
+        service.inserir(dto.getMedida());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizar(@PathVariable int id, @RequestBody UnidadeMedidaDTO dto) throws SQLException {
+        service.atualizar(id, dto.getMedida());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable int id) throws SQLException {
+        service.deletar(id);
+        return ResponseEntity.ok().build();
     }
 }

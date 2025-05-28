@@ -16,43 +16,47 @@ public class UnidadeMedidaService {
     @Autowired
     private DataSource dataSource;
 
-    public UnidadeMedidaDTO criarUnidadeMedida(UnidadeMedidaDTO dto) throws SQLException {
+    public List<UnidadeMedidaDTO> listar() throws SQLException {
+        List<UnidadeMedidaDTO> lista = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_INSERIR_UNIDADE_MEDIDA(?)}")) {
-            stmt.setString(1, dto.getMedida());
-            stmt.execute();
-        }
-        return buscarPorNome(dto.getMedida());
-    }
+             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_UNIDADE_MEDIDA(?)}")) {
 
-    public List<UnidadeMedidaDTO> listarUnidadesMedida() throws SQLException {
-        List<UnidadeMedidaDTO> unidades = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_UNIDADES_MEDIDA(?)}")) {
             stmt.registerOutParameter(1, OracleTypes.CURSOR);
             stmt.execute();
-
             ResultSet rs = (ResultSet) stmt.getObject(1);
+
             while (rs.next()) {
-                unidades.add(new UnidadeMedidaDTO(rs.getString("MEDIDA"), rs.getInt("ID")));
+                lista.add(new UnidadeMedidaDTO(rs.getInt("ID"), rs.getString("MEDIDA")));
             }
         }
-        return unidades;
+        return lista;
     }
 
-    public UnidadeMedidaDTO buscarPorNome(String nome) throws SQLException {
+    public void inserir(String medida) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_BUSCAR_UNIDADE_POR_NOME(?, ?)}")) {
-            stmt.setString(1, nome);
-            stmt.registerOutParameter(2, OracleTypes.CURSOR);
-            stmt.execute();
+             CallableStatement stmt = conn.prepareCall("{call T09F_INSERIR_UNIDADE_MEDIDA(?)}")) {
 
-            try (ResultSet rs = (ResultSet) stmt.getObject(2)) {
-                if (rs.next()) {
-                    return new UnidadeMedidaDTO(rs.getString("MEDIDA"), rs.getInt("ID"));
-                }
-            }
+            stmt.setString(1, medida);
+            stmt.execute();
         }
-        return null;
+    }
+
+    public void atualizar(int id, String medida) throws SQLException {
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_ATUALIZAR_UNIDADE_MEDIDA(?, ?)}")) {
+
+            stmt.setInt(1, id);
+            stmt.setString(2, medida);
+            stmt.execute();
+        }
+    }
+
+    public void deletar(int id) throws SQLException {
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_DELETAR_UNIDADE_MEDIDA(?)}")) {
+
+            stmt.setInt(1, id);
+            stmt.execute();
+        }
     }
 }
