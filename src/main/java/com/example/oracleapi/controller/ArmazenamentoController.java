@@ -16,10 +16,10 @@ public class ArmazenamentoController {
     @Autowired
     private ArmazenamentoService service;
 
-  /*  @GetMapping
+    @GetMapping
     public ResponseEntity<List<ArmazenamentoDTO>> listar() throws SQLException {
         return ResponseEntity.ok(service.listar());
-    }*/
+    }
 
     @PostMapping
     public ResponseEntity<?> inserir(@RequestBody ArmazenamentoDTO dto) {
@@ -27,21 +27,30 @@ public class ArmazenamentoController {
             service.inserir(dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            e.printStackTrace(); // Mostra no console
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Erro ao salvar armazenamento: " + e.getMessage());
         }
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizar(@PathVariable int id, @RequestBody ArmazenamentoDTO dto) throws SQLException {
-        service.atualizar(id, dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> atualizar(@PathVariable int id, @RequestBody ArmazenamentoDTO dto) {
+        try {
+            service.atualizar(id, dto);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro ao atualizar armazenamento: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable int id) throws SQLException {
-        service.deletar(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deletar(@PathVariable int id) {
+        try {
+            service.deletar(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro ao excluir armazenamento: " + e.getMessage());
+        }
     }
 }

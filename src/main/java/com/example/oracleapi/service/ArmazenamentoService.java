@@ -16,7 +16,7 @@ public class ArmazenamentoService {
     @Autowired
     private DataSource dataSource;
 
-    /*public List<ArmazenamentoDTO> listar() throws SQLException {
+    public List<ArmazenamentoDTO> listar() throws SQLException {
         List<ArmazenamentoDTO> lista = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
              CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_ARMAZENAMENTO(?)}")) {
@@ -29,13 +29,13 @@ public class ArmazenamentoService {
                 lista.add(new ArmazenamentoDTO(
                         rs.getInt("ID"),
                         rs.getString("CODIGO"),
-                        rs.getInt("ID_SALA"),
-                        rs.getInt("ID_TIPO_ARMAZENAMENTO")
+                        rs.getInt("ID_T09F_SALA"),
+                        rs.getInt("ID_T09F_TIPO_ARMAZENAMENTO")
                 ));
             }
         }
         return lista;
-    }*/
+    }
 
     public void inserir(ArmazenamentoDTO dto) throws SQLException {
         try (Connection conn = dataSource.getConnection();
@@ -49,16 +49,16 @@ public class ArmazenamentoService {
         }
     }
 
-
-
-
     public void atualizar(int id, ArmazenamentoDTO dto) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_ATUALIZAR_ARMAZENAMENTO(?, ?, ?)}")) {
+             CallableStatement stmt = conn.prepareCall("{call T09F_ATUALIZAR_ARMAZENAMENTO(?, ?, ?, ?)}")) {
 
+            stmt.setInt(1, id);
             stmt.setString(2, dto.getCodigo());
-            stmt.setInt(4, dto.getIdSala());
-            stmt.setInt(5, dto.getIdTipoArmazenamento());
+            stmt.setInt(3, dto.getIdSala());
+            stmt.setInt(4, dto.getIdTipoArmazenamento());
+
+            stmt.execute();
         }
     }
 
