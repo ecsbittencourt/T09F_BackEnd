@@ -1,6 +1,7 @@
 package com.example.oracleapi.service;
 
 import com.example.oracleapi.dto.SalaDTO;
+import com.example.oracleapi.dto.SalaESetorDTO;
 import oracle.jdbc.OracleTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,34 @@ public class SalaService {
         }
     }
 
+    public List<SalaESetorDTO> listarSalasERespectivosSetores() throws SQLException {
+        List<SalaESetorDTO> salas = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SALAS_E_SETORES(?)}")) {
+
+            stmt.registerOutParameter(1, OracleTypes.CURSOR);
+            stmt.execute();
+
+            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
+                while (rs.next()) {
+                    salas.add(new SalaESetorDTO(
+                            rs.getInt("ID"),
+                            rs.getInt("NUMERO"),
+                            rs.getInt("ID_SETOR"),
+                            rs.getString("NOME_SETOR")
+                    ));
+                }
+            }
+        }
+        return salas;
+    }
+
     public List<SalaDTO> listarSalas() throws SQLException {
         List<SalaDTO> salas = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SALAS_E_SETORES(?)}")) {
+             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SALAS(?)}")) {
 
             stmt.registerOutParameter(1, OracleTypes.CURSOR);
             stmt.execute();
