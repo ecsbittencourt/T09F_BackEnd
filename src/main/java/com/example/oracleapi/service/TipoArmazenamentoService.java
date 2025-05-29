@@ -175,8 +175,6 @@ public class TipoArmazenamentoService {
             List<TipoArmazenamentoTipoMedicamentoDTO> listaDesatualizadaBanco = buscarTipoArmazenamentoTipoMedicamento(request.id());
             for(TipoArmazenamentoTipoMedicamentoDTO registro : listaDesatualizadaBanco) {
                 if(request.capacidades().stream().noneMatch(capacidade -> registro.idTipoMedicamento().equals(capacidade.id()))) {
-                    // deletar o registro
-                    System.out.println("AAAAA: " + registro.toString());
                     CallableStatement stmt4 = conn.prepareCall("{call T09F_DELETAR_TIPO_MEDICAMENTO_TIPO_ARMAZENAMENTO(?)}");
                     stmt4.setInt(1, registro.id());
                     stmt4.execute();
