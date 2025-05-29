@@ -31,7 +31,7 @@ public class SalaService {
         List<SalaDTO> salas = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SALAS(?)}")) {
+             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SALAS_E_SETORES(?)}")) {
 
             stmt.registerOutParameter(1, OracleTypes.CURSOR);
             stmt.execute();
