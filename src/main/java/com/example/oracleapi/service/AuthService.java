@@ -20,6 +20,25 @@ public class AuthService {
     }
 
     public UserDTO auth(UserDTO dto) throws SQLException {
+        try(Connection conn = dataSource.getConnection();
+        CallableStatement stmt = conn.prepareCall("{call T09F_BUSCAR_USUARIO_POR_NOME_E_SENHA(?,?,?)}")) {
+            stmt.setString(1, dto.nome());
+            stmt.setString(2, dto.digestSenha());
+            stmt.registerOutParameter(3, OracleTypes.CURSOR);
+            stmt.execute();
+
+            try(ResultSet rs = (ResultSet) stmt.getObject(3)) {
+                if(rs.next()) {
+                    return new UserDTO(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3)
+                    );
+                }
+            } catch (SQLException ex) {
+                return null;
+            }
+        }
         return null;
     }
 
