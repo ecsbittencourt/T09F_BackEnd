@@ -3,6 +3,7 @@ package com.example.oracleapi.controller;
 import com.example.oracleapi.dto.ArmazenamentoDTO;
 import com.example.oracleapi.service.ArmazenamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,36 +22,29 @@ public class ArmazenamentoController {
         return ResponseEntity.ok(service.listar());
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<ArmazenamentoDTO> buscarPorId(@PathVariable Integer id) throws SQLException {
+        return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
     @PostMapping
-    public ResponseEntity<?> inserir(@RequestBody ArmazenamentoDTO dto) {
-        try {
-            service.inserir(dto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Erro ao salvar armazenamento: " + e.getMessage());
-        }
+    public ResponseEntity<ArmazenamentoDTO> inserir(@RequestBody ArmazenamentoDTO dto) throws SQLException{
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                service.inserir(dto)
+        );
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable int id, @RequestBody ArmazenamentoDTO dto) {
-        try {
-            service.atualizar(id, dto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Erro ao atualizar armazenamento: " + e.getMessage());
-        }
+    public ResponseEntity<ArmazenamentoDTO> atualizar(@PathVariable int id, @RequestBody ArmazenamentoDTO dto) throws SQLException{
+            return ResponseEntity.ok(service.atualizar(id, dto));
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable int id) {
-        try {
+    public ResponseEntity<Void> deletar(@PathVariable int id) throws SQLException{
             service.deletar(id);
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Erro ao excluir armazenamento: " + e.getMessage());
-        }
+
     }
 }
