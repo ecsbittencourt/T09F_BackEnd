@@ -17,13 +17,15 @@ public class EstoqueController {
     private EstoqueService estoqueService;
 
     @GetMapping
-    public ResponseEntity<List<EstoqueDTO>> listarEstoques() {
-        try {
-            return ResponseEntity.ok(estoqueService.listarEstoques());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+    public ResponseEntity<List<EstoqueDTO>> listarEstoques() throws SQLException{
+
+        return ResponseEntity.ok(estoqueService.listarEstoques());
+
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<EstoqueDTO> buscarEstoque(@PathVariable Integer id) throws SQLException{
+        return ResponseEntity.ok(estoqueService.buscarEstoque(id));
     }
 
     @PostMapping
@@ -37,33 +39,15 @@ public class EstoqueController {
         }
     }
 
-    @GetMapping("/tipos")
-    public ResponseEntity<List<Object>> listarTiposEstoque() {
-        try {
-            return ResponseEntity.ok(estoqueService.listarTiposEstoque());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+    @PutMapping("{id}")
+    public ResponseEntity<EstoqueDTO> atualizarEstoque(@PathVariable Integer id, @RequestBody EstoqueDTO dto) throws SQLException{
+        if(!id.equals(dto.id())) throw new RuntimeException("Erro! Ids não correspondem.");
+        return ResponseEntity.ok(estoqueService.atualizarEstoque(dto));
     }
 
-    @GetMapping("/setores")
-    public ResponseEntity<List<Object>> listarSetores() {
-        try {
-            return ResponseEntity.ok(estoqueService.listarSetores());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
-    }
-
-    @GetMapping("/salas")
-    public ResponseEntity<List<Object>> listarSalas() {
-        try {
-            return ResponseEntity.ok(estoqueService.listarSalas());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        }
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deletarEstoque(@PathVariable Integer id) throws SQLException {
+        estoqueService.deletarEstoque(id);
+        return ResponseEntity.noContent().build();
     }
 }

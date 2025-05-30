@@ -27,12 +27,16 @@ public class EstoqueService {
 
             try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
                 while (rs.next()) {
-                    EstoqueDTO dto = new EstoqueDTO();
-                    dto.setId(rs.getInt("ID"));
-                    dto.setNome(rs.getString("NOME"));
-                    dto.setId_t09f_tipo_estoque(rs.getInt("ID_T09F_TIPO_ESTOQUE"));
-                    dto.setId_t09f_setor(rs.getInt("ID_T09F_SETOR"));
-                    dto.setId_t09f_sala(rs.getInt("ID_T09F_SALA"));
+                    EstoqueDTO dto = new EstoqueDTO(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            rs.getInt(3),
+                            rs.getString(4),
+                            rs.getInt(5),
+                            rs.getInt(6),
+                            rs.getInt(7),
+                            rs.getString(8)
+                    );
                     estoques.add(dto);
                 }
             }
@@ -42,73 +46,62 @@ public class EstoqueService {
 
     public void criarEstoque(EstoqueDTO dto) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_INSERIR_ESTOQUE(?, ?, ?, ?)}")) {
+             CallableStatement stmt = conn.prepareCall("{call T09F_INSERIR_ESTOQUE(?, ?, ?)}")) {
 
-            stmt.setString(1, dto.getNome());
-            stmt.setInt(2, dto.getId_t09f_tipo_estoque());
-            stmt.setInt(3, dto.getId_t09f_setor());
-            stmt.setInt(4, dto.getId_t09f_sala());
+            stmt.setString(1, dto.nome());
+            stmt.setInt(2, dto.idTipoEstoque());
+            stmt.setInt(3, dto.idSala());
 
             stmt.execute();
         }
     }
 
-    public List<Object> listarTiposEstoque() throws SQLException {
-        // Exemplo genérico, ajuste para seu DTO específico de tipo estoque
-        List<Object> tipos = new ArrayList<>();
+    public EstoqueDTO buscarEstoque(Integer id) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_TIPO_ESTOQUE(?)}")) {
-            stmt.registerOutParameter(1, OracleTypes.CURSOR);
+             CallableStatement stmt = conn.prepareCall("{call T09F_BUSCAR_ESTOQUE_POR_ID(?,?)}")) {
+            stmt.setInt(1, id);
+            stmt.registerOutParameter(2, OracleTypes.CURSOR);
             stmt.execute();
 
-            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
-                while (rs.next()) {
-                    tipos.add(new Object() {
-                        public int id = rs.getInt("ID");
-                        public String nome = rs.getString("NOME");
-                    });
+            try (ResultSet rs = (ResultSet) stmt.getObject(2)) {
+                if (rs.next()) {
+                    return new EstoqueDTO(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            rs.getInt(3),
+                            rs.getString(4),
+                            rs.getInt(5),
+                            rs.getInt(6),
+                            rs.getInt(7),
+                            rs.getString(8)
+                    );
+
                 }
             }
         }
-        return tipos;
+        return null;
     }
 
-    public List<Object> listarSetores() throws SQLException {
-        List<Object> setores = new ArrayList<>();
+    public EstoqueDTO atualizarEstoque(EstoqueDTO dto) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SETORES(?)}")) {
-            stmt.registerOutParameter(1, OracleTypes.CURSOR);
+             CallableStatement stmt = conn.prepareCall("{call T09F_ATUALIZAR_ESTOQUE(?, ?,?,?)}")) {
+            stmt.setInt(1, dto.id());
+            stmt.setString(2, dto.nome());
+            stmt.setInt(3, dto.idTipoEstoque());
+            stmt.setInt(4, dto.idSala());
             stmt.execute();
-
-            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
-                while (rs.next()) {
-                    setores.add(new Object() {
-                        public int id = rs.getInt("ID");
-                        public String nome = rs.getString("NOME");
-                    });
-                }
-            }
         }
-        return setores;
+        return buscarEstoque(dto.id());
     }
 
-    public List<Object> listarSalas() throws SQLException {
-        List<Object> salas = new ArrayList<>();
+    public void deletarEstoque(Integer id) throws SQLException {
+
         try (Connection conn = dataSource.getConnection();
-             CallableStatement stmt = conn.prepareCall("{call T09F_LISTAR_SALAS(?)}")) {
-            stmt.registerOutParameter(1, OracleTypes.CURSOR);
+             CallableStatement stmt = conn.prepareCall("{call T09F_DELETAR_ESTOQUE(?)}")) {
+
+            stmt.setInt(1, id);
             stmt.execute();
 
-            try (ResultSet rs = (ResultSet) stmt.getObject(1)) {
-                while (rs.next()) {
-                    salas.add(new Object() {
-                        public int id = rs.getInt("ID");
-                        public int numero = rs.getInt("NUMERO");
-                        public int idSetor = rs.getInt("ID_T09F_SETOR");
-                    });
-                }
-            }
         }
-        return salas;
     }
 }
